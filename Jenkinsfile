@@ -16,18 +16,28 @@ pipeline {
             }
         }
         
+        stage('Build Docker Image') {
+            steps {
+                // Construire l'image Docker en utilisant le Dockerfile dans le répertoire courant
+                script {
+                    docker.build("my-docker-image:${BUILD_ID}")
+                }
+            }
+        }
+        
         stage('Test') {
             steps {
-                // Exécuter les tests unitaires 2
+                // Exécuter les tests unitaires
                 sh 'mvn test'
             }
         }
         
-        stage('Deploy') {
+        stage('Cleanup') {
             steps {
-                // Exemple d'étape de déploiement
-                echo 'Déploiement de l\'application...'
-                // Ajoutez vos commandes de déploiement ici
+                // Supprimer l'image Docker
+                script {
+                    docker.image("my-docker-image:${BUILD_ID}").remove(force: true)
+                }
             }
         }
     }
